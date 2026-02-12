@@ -12,7 +12,7 @@
 
 <meta name="author" content="Matthieu Viry and Timothée Giraud" />
 
-<meta name="date" content="2025-04-08" />
+<meta name="date" content="2026-02-12" />
 
 <title>Installing Valhalla with Docker</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Installing Valhalla with Docker</h1>
 <h4 class="author">Matthieu Viry and Timothée Giraud</h4>
-<h4 class="date">2025-04-08</h4>
+<h4 class="date">2026-02-12</h4>
 
 
 
@@ -380,12 +380,11 @@ command in your terminal:</p>
 <div id="valhalla-installation" class="section level2" number="0.3">
 <h2><span class="header-section-number">0.3</span> Valhalla
 installation</h2>
-<p>Several Docker images are available, <a href="https://github.com/orgs/valhalla/packages">the official one
-provided by Valhalla</a> and <a href="https://github.com/nilsnolde/docker-valhalla">one maintained by
-the community</a>.</p>
-<p>The community-maintained image features many additional options,
-particularly useful for customizing the Valhalla instance to be created.
-This is the one we’ll be using.</p>
+<p><a href="https://github.com/orgs/valhalla/packages">Official Docker
+images</a> are provided by Valhalla team. The one named
+“valhalla-scripted” features many options particularly useful for
+customizing the Valhalla instance to be created (see its <a href="https://github.com/valhalla/valhalla/tree/master/docker">documentation</a>
+if needed) and it’s therefore the one we use here.</p>
 <div id="downloading-an-osm-extract" class="section level3" number="0.3.1">
 <h3><span class="header-section-number">0.3.1</span> Downloading an OSM
 extract</h3>
@@ -396,9 +395,9 @@ available on <a href="https://planet.openstreetmap.org/">https://planet.openstre
 but they are very large and not recommended for local use (as they would
 require a lot of memory).</p>
 <p>Create a folder in which to store this file, here we’ll call it
-“routing-valhalla” (use <code>mkdir routing-valhalla</code> in your
-terminal to create it). Then, download the OSM extract and move it to
-this folder.</p>
+<code>routing-valhalla</code> (use <code>mkdir routing-valhalla</code>
+in your terminal to create it). Then, download the OSM extract and move
+it to this folder.</p>
 </div>
 <div id="running-the-docker-container" class="section level3" number="0.3.2">
 <h3><span class="header-section-number">0.3.2</span> Running the Docker
@@ -411,7 +410,7 @@ will need to adapt the path to the folder):</p>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>    <span class="at">-e</span> build_elevation=True <span class="dt">\</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    <span class="at">-p</span> 8002:8002 <span class="dt">\</span></span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="at">-v</span> <span class="va">$PWD</span>/routing-valhalla:/custom_files <span class="dt">\</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    ghcr.io/nilsnolde/docker-valhalla/valhalla:latest</span></code></pre></div>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    ghcr.io/valhalla/valhalla-scripted:latest</span></code></pre></div>
 <p>Here we are using:</p>
 <ul>
 <li>the <code>-t</code> option to run the container in interactive
@@ -423,24 +422,24 @@ the host’s port 8002,</li>
 <li>the <code>-v</code> option to mount the folder we created earlier
 (<code>routing-valhalla</code>) to the <code>/custom_files</code> folder
 in the container,</li>
-<li><code>ghcr.io/nilsnolde/docker-valhalla/valhalla:latest</code> image
-to run the container.</li>
+<li><code>ghcr.io/valhalla/valhalla-scripted:latest</code> image to run
+the container.</li>
 </ul>
 <p>and more importantly,</p>
 <ul>
 <li>the <code>-e</code> option to set the environment variable
-<code>build_elevation</code> to <code>True</code>, which will build the
+<code>build_elevation</code> to <code>True</code>, which builds the
 elevation data for the region.</li>
 </ul>
-<p>Other useful options are listed on the <a href="https://github.com/nilsnolde/docker-valhalla?tab=readme-ov-file#environment-variables">image
-repository</a>.</p>
+<p>Other useful options are listed on the <a href="https://github.com/valhalla/valhalla/tree/master/docker#environment-variables">image’s
+README file</a>.</p>
 <p>These include : - <code>build_elevation</code> to download and build
 elevation data (default: <code>False</code>), this is particularly
 useful for bicycle and pedestrian routing, - <code>build_admins</code>
-to build administrative boundaries (default: <code>False</code>), this
-is useful for applying border-crossing penalties, -
+to build administrative boundaries (default: <code>True</code>), this is
+useful for applying border-crossing penalties, -
 <code>build_time_zones</code> to build timezone data (default:
-<code>False</code>), this is useful for time-dependent routing.</p>
+<code>True</code>), this is useful for time-dependent routing.</p>
 <p>Once the graph is built, you should see a message like this:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">INFO:</span> Found config file. Starting valhalla service!</span></code></pre></div>
 <p>Note that this message is often followed by a several other messages,
@@ -466,14 +465,14 @@ command in another terminal:</p>
 <p>To restart the container, you can run the following command in your
 terminal:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">docker</span> start valhalla_server</span></code></pre></div>
-<p>This time the server will start instantly, as the graph has already
-been built, and the container will run in the background (in detached
-mode). If needed you can check the logs of the container with:</p>
+<p>This time the server starts instantly, as the graph has already been
+built, and the container will run in the background (in detached mode).
+If needed you can check the logs of the container with:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">docker</span> logs valhalla_server</span></code></pre></div>
 <p>Finally, to totally get rid of the container and the image, you can
 run the following commands:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="ex">docker</span> rm valhalla_server</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="ex">docker</span> rmi ghcr.io/nilsnolde/docker-valhalla/valhalla:latest</span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="ex">docker</span> rmi ghcr.io/valhalla/valhalla-scripted:latest</span></code></pre></div>
 </div>
 </div>
 <div id="using-valhalla-with-r" class="section level2" number="0.4">

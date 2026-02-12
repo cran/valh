@@ -10,26 +10,25 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' vl_status("https://valhalla1.openstreetmap.de/", verbose = FALSE)
+#' }
 vl_status <- function(server = getOption("valh.server"),
                       verbose = FALSE) {
   # Build the JSON argument of the request
-  vrbs <- ifelse(isTRUE(verbose), '?json={"verbose": true}', "")
+  json_body <- ifelse(isTRUE(verbose), '{"verbose": true}', "")
 
   # Construct the url
-  url <- paste0(base_url(server), "status", vrbs)
+  url <- paste0(base_url(server), "status")
 
-  # Send the request and handle possible errors
-  r <- get_results(url)
+  # Send the POST request and handle possible errors
+  r <- get_results(url, json_body)
 
   # Parse the response to a spatial data frame
   res <- jsonlite::fromJSON(rawToChar(r$content))
 
   # Convert to human readable date format
   res$tileset_last_modified <- as.POSIXct(res$tileset_last_modified, "%Y-%m-%d %H:%M")
-  if (!is.null(res$osm_changeset)) {
-    res$osm_changeset <- as.POSIXct(res$osm_changeset)
-  }
 
   if (!is.null(res$bbox)) {
     res$bbox <- sf::st_read(
